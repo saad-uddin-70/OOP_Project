@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -66,10 +67,20 @@ public:
 // Function to add a District to a Division and save it in a file
 void addDistrictToDivision(string divisionName, District district)
 {
-    ofstream f_dv;
-    f_dv.open(divisionName + ".txt", ios::app);
-    f_dv << district.get_district() << " " << district.get_land() << endl;
-    f_dv.close();
+    Division* division = dynamic_cast<Division*>(&district);
+    if (division)
+    {
+        ofstream f_dv;
+        f_dv.open(divisionName + ".txt", ios::app);
+        f_dv << district.get_district() << " " << district.get_land() << endl;
+        f_dv.close();
+        cout << endl << "Added District: " << district << endl << endl;
+    }
+    else
+    {
+        cout << "Invalid District object. It does not belong to a Division." << endl;
+        // Handle the error or perform other actions
+    }
 }
 
 // Function to calculate the total land area of a Division or Bangladesh
@@ -140,6 +151,7 @@ int main()
 
     do {
         // Menu options
+        level:
         cout << "1. Add a Division\n";
         cout << "2. Add a District\n";
         cout << "3. Modify a District\n";
@@ -181,7 +193,7 @@ int main()
             string dv_name, X;
             cin >> dv_name;
 
-            District d2(ds_name, dv_name, disArea);
+            District district_2(ds_name, dv_name, disArea);
             int flag = 1;
 
             ifstream f(S + ".txt");
@@ -195,8 +207,8 @@ int main()
                 if (divisionName == dv_name)
                 {
                     flag = 0;
-                    addDistrictToDivision(dv_name, d2);
-                    cout << endl << "Added District: " << d2 << endl << endl;
+                    addDistrictToDivision(dv_name, district_2);
+                 //   cout << endl << "Added District: " << district_2 << endl << endl;
                     a = totalLandArea(dv_name);
                 }
             }
@@ -204,11 +216,11 @@ int main()
             {
                 ofstream f_dv;
                 f_dv.open(S + ".txt", ios::app);
-                f_dv << d2.get_division() << " " << d2.get_land() << endl;
+                f_dv << district_2.get_division() << " " << district_2.get_land() << endl;
                 f_dv.close();
 
-                addDistrictToDivision(dv_name, d2);
-                cout << endl << "Added District: " << d2 << endl << endl;
+                addDistrictToDivision(dv_name, district_2);
+               // cout << endl << "Added District: " << district_2 << endl << endl;
                 a = totalLandArea(dv_name);
             }
             updateDivisionLand(S, dv_name, a);
@@ -220,11 +232,39 @@ int main()
             cout << "Enter the District Name with Division Name: ";
             string dis_name, div_name;
             cin >> dis_name >> div_name;
-            cout << "Enter New Area Acquired: ";
-            int land, land1;
+            int land, land1,errorHandling=1;
             int total_line = 0, desired_line = 0;
+
+
+            // Check if the division name is valid
+            ifstream divisionFile(S + ".txt");
+            string divisionLine;
+            bool isValidDivision = false;
+            while (getline(divisionFile, divisionLine))
+            {
+                string divisionFromFile;
+                int landAreaFromFile;
+                istringstream iss(divisionLine);
+                iss >> divisionFromFile >> landAreaFromFile;
+                if (divisionFromFile == div_name)
+                {
+                    isValidDivision = true;
+                    break;
+                }
+            }
+            divisionFile.close();
+
+            if (!isValidDivision)
+            {
+                cout << "Invalid division name. Please enter a valid division name." << endl;
+                break;
+            }
+
+            cout << "Enter New Area Acquired: ";
             cin >> land;
             fstream file2(div_name + ".txt", ios::in);
+
+
             string line, district_name;
             vector<string> lines;
             while (getline(file2, line))
@@ -235,11 +275,31 @@ int main()
                 iss >> district_name >> land1;
                 if (dis_name == district_name)
                 {
+                    errorHandling=0;
                     land += land1;
                     desired_line = total_line;
                 }
             }
             file2.close();
+
+            try
+            {
+                if(errorHandling)
+                {
+                    throw(dis_name);
+                }
+                else
+                {
+                    cout<<"Successfully Added District Area\n";
+                }
+            }
+            catch(string x)
+            {
+                cout<<endl<<"The District Not Found in the Division\nDo correctly again\n"<<endl;
+                goto level;
+            }
+
+
             ofstream file3;
             file3.open(div_name + ".txt", ios::out);
             if (file3.fail())
