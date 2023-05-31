@@ -26,6 +26,10 @@ It was established that any updates made to the land area of a district within t
 
 - **File Input/Output (I/O):** The code utilizes file I/O to read from and write to files. It includes operations such as creating and updating text files to store division and district information.
 
+- **Run-Time Type Information (RTTI):** The program utilizes RTTI to determine the types of objects at runtime. This enables dynamic polymorphism and allows for flexible object manipulation.
+
+- **Exception and Error Handling:** The code includes error handling mechanisms to handle file input/output operations and gracefully handle any potential errors or exceptions that may occur during runtime
+
 
 ## Contact Information
 
